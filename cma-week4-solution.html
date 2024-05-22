@@ -105,6 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="preparation" class="level2">
 <h2 class="anchored" data-anchor-id="preparation">Preparation</h2>
+<p>Here is the code from preparation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"readr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -136,7 +137,19 @@ Attaching package: 'dplyr'</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package 'ggplot2' was built under R version 4.3.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>wildschwein <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"wildschwein_BE_2056.csv"</span>, <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"lubridate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"SimilarityMeasures"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"reshape2"</span>) <span class="co"># Plot the results</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>wildschwein <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"wildschwein_BE_2056.csv"</span>, <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 51246 Columns: 6</code></pre>
 </div>
@@ -150,15 +163,17 @@ dttm (1): DatetimeUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will use it later, so set the remove as false.</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> wildschwein <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>), <span class="at">crs =</span> <span class="dv">2056</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(TierName <span class="sc">==</span> <span class="st">"Sabi"</span>, DatetimeUTC <span class="sc">&gt;=</span> <span class="st">"2015-07-01"</span>, DatetimeUTC <span class="sc">&lt;</span> <span class="st">"2015-07-03"</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mark the static points by plotting</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># real good plot!</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># but just "mark" the static points (without calculation)</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sabi, <span class="fu">aes</span>(E, N, <span class="at">color=</span>DatetimeUTC)) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_path</span>() <span class="sc">+</span> <span class="fu">coord_fixed</span>() <span class="sc">+</span> <span class="fu">scale_color_datetime</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_colorbar</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> .<span class="dv">5</span>, <span class="at">barwidth =</span> <span class="fu">unit</span>(<span class="dv">20</span>, <span class="st">"lines"</span>), <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">5</span>, <span class="st">"lines"</span>))) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">y=</span><span class="dv">1205120</span>, <span class="at">x=</span><span class="dv">2570470</span>, <span class="at">size =</span> <span class="dv">20</span>, <span class="at">pch =</span><span class="dv">21</span>, <span class="at">color =</span><span class="st">"black"</span>, <span class="at">stroke =</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will use E and N later, so set the remove as false.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># if true, the original coordinate column will remove after generating geometry</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> wildschwein <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>), <span class="at">crs =</span> <span class="dv">2056</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(TierName <span class="sc">==</span> <span class="st">"Sabi"</span>, DatetimeUTC <span class="sc">&gt;=</span> <span class="st">"2015-07-01"</span>, DatetimeUTC <span class="sc">&lt;</span> <span class="st">"2015-07-03"</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># mark the static points by plotting</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># real good plot!</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># but just "mark" the static points (without calculation)</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sabi, <span class="fu">aes</span>(E, N, <span class="at">color=</span>DatetimeUTC)) <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_path</span>() <span class="sc">+</span> <span class="fu">coord_fixed</span>() <span class="sc">+</span> <span class="fu">scale_color_datetime</span>(<span class="at">low =</span> <span class="st">"blue"</span>, <span class="at">high =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_colorbar</span>(<span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> .<span class="dv">5</span>, <span class="at">barwidth =</span> <span class="fu">unit</span>(<span class="dv">20</span>, <span class="st">"lines"</span>), <span class="at">barheight =</span> <span class="fu">unit</span>(<span class="dv">1</span>, <span class="st">"lines"</span>))) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">y=</span><span class="dv">1205120</span>, <span class="at">x=</span><span class="dv">2570470</span>, <span class="at">size =</span> <span class="dv">20</span>, <span class="at">pch =</span><span class="dv">21</span>, <span class="at">color =</span><span class="st">"black"</span>, <span class="at">stroke =</span><span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -171,30 +186,32 @@ dttm (1): DatetimeUTC
 <p>pos[n-2] to pos[n] pos[n-1] to pos[n] pos[n] to pos[n+1] pos[n] to pos[n+2]</p>
 <p>Step b): Measure the distance from every point to every other point within this temporal window We can use the function distance_by_element from week 2 in combination with lead() and lag() to calculate the Euclidean distance. For example, to create the necessary offset of n-2, we use lag(x, 2). For each offset, we create one individual column.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recap: set geometry as lag</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>distance_by_element <span class="ot">&lt;-</span> <span class="cf">function</span>(later, now) {</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_distance</span>(later, now, <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus2 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">2</span>), geometry),  <span class="co"># distance to pos -30 minutes</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus1 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">1</span>), geometry),  <span class="co"># distance to pos -15 minutes</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus1  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">1</span>)), <span class="co"># distance to pos +15 mintues</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus2  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">2</span>))  <span class="co"># distance to pos +30 minutes</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recap: set geometry as lag</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>distance_by_element <span class="ot">&lt;-</span> <span class="cf">function</span>(later, now) {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_distance</span>(later, now, <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus2 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">2</span>), geometry),  <span class="co"># distance to pos -30 minutes</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus1 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">1</span>), geometry),  <span class="co"># distance to pos -15 minutes</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus1  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">1</span>)), <span class="co"># distance to pos +15 mintues</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus2  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">2</span>))  <span class="co"># distance to pos +30 minutes</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Now we want to calculate the mean distance of nMinus2, nMinus1, nPlus1, nPlus2 for each row. Since we want the mean value per Row, we have to explicitly specify this before mutate() with the function rowwise(). To remove this rowwise-grouping, we end the operation with ungroup().</p>
+<p>Note that for the first two positions, we cannot calculate a stepMean since there is no Position n-2 for these positions. This is also true for the last to positions (lacking a position n+2).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">stepMean =</span> <span class="fu">mean</span>(<span class="fu">c</span>(nMinus2, nMinus1, nPlus1, nPlus2))</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>sabi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">stepMean =</span> <span class="fu">mean</span>(<span class="fu">c</span>(nMinus2, nMinus1, nPlus1, nPlus2))</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>sabi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 192 features and 11 fields
 Geometry type: POINT
@@ -219,19 +236,20 @@ Projected CRS: CH1903+ / LV95
 #   nPlus1 &lt;dbl&gt;, nPlus2 &lt;dbl&gt;, stepMean &lt;dbl&gt;</code></pre>
 </div>
 </div>
+<p>Step c): Remove “static points” We can now determine if an animal is moving or not by specifying a threshold distance on stepMean. In our example, we use the mean value as a threshold: Positions with distances below this value are considered static.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">static =</span> stepMean <span class="sc">&lt;</span> <span class="fu">mean</span>(stepMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>sabi_filter <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>static)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>sabi_filter <span class="sc">|&gt;</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(E, N)) <span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_path</span>() <span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sabi <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">static =</span> stepMean <span class="sc">&lt;</span> <span class="fu">mean</span>(stepMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>sabi_filter <span class="ot">&lt;-</span> sabi <span class="sc">|&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>static)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>sabi_filter <span class="sc">|&gt;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(E, N)) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_path</span>() <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -243,9 +261,10 @@ Projected CRS: CH1903+ / LV95
 </section>
 <section id="task" class="level2">
 <h2 class="anchored" data-anchor-id="task">Task</h2>
+<p>We will use our posmo data in a certain day in task 1-4. ### Task 1: Segmentation</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import data</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>posmo <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"posmo_03_23_05_03.csv"</span>, <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import data</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>posmo <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"posmo_03_23_05_03.csv"</span>, <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 25549 Columns: 7
 ── Column specification ────────────────────────────────────────────────────────
@@ -257,8 +276,8 @@ dttm (1): datetime
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># show as a tibble</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>posmo <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># show as a tibble</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>posmo <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 25,549 × 7
    user_id     datetime            weekday place_name transport_mode lon_x lat_y
@@ -276,46 +295,288 @@ dttm (1): datetime
 # ℹ 25,539 more rows</code></pre>
 </div>
 </div>
+<p>As you see, we have data from different dates, so we need to filter data by unique dates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recap: set geometry as lag</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>distance_by_element <span class="ot">&lt;-</span> <span class="cf">function</span>(later, now) {</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_distance</span>(later, now, <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>posmo_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(posmo, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon_x"</span>, <span class="st">"lat_y"</span>), <span class="at">crs =</span> <span class="dv">4326</span>)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>posmo_sf <span class="ot">&lt;-</span> posmo_sf <span class="sc">|&gt;</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus2 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">2</span>), geometry),  <span class="co"># distance to pos -30 minutes</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus1 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">1</span>), geometry),  <span class="co"># distance to pos -15 minutes</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus1  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">1</span>)), <span class="co"># distance to pos +15 mintues</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus2  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">2</span>))  <span class="co"># distance to pos +30 minutes</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>posmo_sf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to sf</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>posmo_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(posmo, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon_x"</span>, <span class="st">"lat_y"</span>), <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert CRS to CH1903 / LV95 (EPSG:2056)</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>posmo_sf <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(posmo_sf, <span class="at">crs =</span> <span class="dv">2056</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to filter data for a given date</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>filter_data_by_date <span class="ot">&lt;-</span> <span class="cf">function</span>(data, date) {</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(date) <span class="co"># Convert the input date to Date format</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  filtered_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="fu">as.Date</span>(datetime) <span class="sc">==</span> date)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(filtered_data)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage of the function, filter data in 2024-03-23</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23 <span class="ot">&lt;-</span> <span class="fu">filter_data_by_date</span>(posmo_sf, <span class="st">"2024-03-23"</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the filtered data in 2024-03-23</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(posmo_2024_03_23)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 25549 features and 9 fields
+<pre><code>Simple feature collection with 6 features and 7 fields
 Geometry type: POINT
 Dimension:     XY
-Bounding box:  xmin: 8.504926 ymin: 47.21715 xmax: 8.685076 ymax: 47.40922
-Geodetic CRS:  WGS 84
-# A tibble: 25,549 × 10
-   user_id                 datetime            weekday place_name transport_mode
- * &lt;chr&gt;                   &lt;dttm&gt;              &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;         
- 1 0f84c8f2-20e1-4f1e-b94… 2024-03-23 10:35:10 Sat     Careum Bi… &lt;NA&gt;          
- 2 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk          
- 3 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk          
- 4 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:55:49 Sat     &lt;NA&gt;       Walk          
- 5 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:00 Sat     &lt;NA&gt;       Walk          
- 6 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:11 Sat     &lt;NA&gt;       Walk          
- 7 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:22 Sat     &lt;NA&gt;       Walk          
- 8 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:33 Sat     &lt;NA&gt;       Walk          
- 9 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:44 Sat     &lt;NA&gt;       Walk          
-10 0f84c8f2-20e1-4f1e-b94… 2024-03-23 11:56:55 Sat     &lt;NA&gt;       Walk          
-# ℹ 25,539 more rows
-# ℹ 5 more variables: geometry &lt;POINT [°]&gt;, nMinus2 &lt;dbl&gt;, nMinus1 &lt;dbl&gt;,
+Bounding box:  xmin: 2684159 ymin: 1247707 xmax: 2684182 ymax: 1247771
+Projected CRS: CH1903+ / LV95
+# A tibble: 6 × 8
+  user_id      datetime            weekday place_name transport_mode lon_x lat_y
+  &lt;chr&gt;        &lt;dttm&gt;              &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;
+1 0f84c8f2-20… 2024-03-23 10:35:10 Sat     Careum Bi… &lt;NA&gt;            8.55  47.4
+2 0f84c8f2-20… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+3 0f84c8f2-20… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+4 0f84c8f2-20… 2024-03-23 11:55:49 Sat     &lt;NA&gt;       Walk            8.55  47.4
+5 0f84c8f2-20… 2024-03-23 11:56:00 Sat     &lt;NA&gt;       Walk            8.55  47.4
+6 0f84c8f2-20… 2024-03-23 11:56:11 Sat     &lt;NA&gt;       Walk            8.55  47.4
+# ℹ 1 more variable: geometry &lt;POINT [m]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recap: set geometry as lag</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>distance_by_element <span class="ot">&lt;-</span> <span class="cf">function</span>(later, now) {</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_distance</span>(later, now, <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23<span class="ot">&lt;-</span> posmo_2024_03_23 <span class="sc">|&gt;</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus2 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">2</span>), geometry),  <span class="co"># distance to pos -30 minutes</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus1 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="dv">1</span>), geometry),  <span class="co"># distance to pos -15 minutes</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus1  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">1</span>)), <span class="co"># distance to pos +15 mintues</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus2  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">2</span>))  <span class="co"># distance to pos +30 minutes</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 582 features and 11 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2681425 ymin: 1245768 xmax: 2684396 ymax: 1248208
+Projected CRS: CH1903+ / LV95
+# A tibble: 582 × 12
+   user_id     datetime            weekday place_name transport_mode lon_x lat_y
+ * &lt;chr&gt;       &lt;dttm&gt;              &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;
+ 1 0f84c8f2-2… 2024-03-23 10:35:10 Sat     Careum Bi… &lt;NA&gt;            8.55  47.4
+ 2 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 3 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 4 0f84c8f2-2… 2024-03-23 11:55:49 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 5 0f84c8f2-2… 2024-03-23 11:56:00 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 6 0f84c8f2-2… 2024-03-23 11:56:11 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 7 0f84c8f2-2… 2024-03-23 11:56:22 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 8 0f84c8f2-2… 2024-03-23 11:56:33 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 9 0f84c8f2-2… 2024-03-23 11:56:44 Sat     &lt;NA&gt;       Walk            8.55  47.4
+10 0f84c8f2-2… 2024-03-23 11:56:55 Sat     &lt;NA&gt;       Walk            8.55  47.4
+# ℹ 572 more rows
+# ℹ 5 more variables: geometry &lt;POINT [m]&gt;, nMinus2 &lt;dbl&gt;, nMinus1 &lt;dbl&gt;,
 #   nPlus1 &lt;dbl&gt;, nPlus2 &lt;dbl&gt;</code></pre>
 </div>
 </div>
+<section id="task-2-specify-and-apply-threshold-d" class="level3">
+<h3 class="anchored" data-anchor-id="task-2-specify-and-apply-threshold-d">Task 2: Specify and apply threshold d</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23 <span class="ot">&lt;-</span> posmo_2024_03_23 <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">stepMean =</span> <span class="fu">mean</span>(<span class="fu">c</span>(nMinus2, nMinus1, nPlus1, nPlus2))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 582 features and 12 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2681425 ymin: 1245768 xmax: 2684396 ymax: 1248208
+Projected CRS: CH1903+ / LV95
+# A tibble: 582 × 13
+   user_id     datetime            weekday place_name transport_mode lon_x lat_y
+   &lt;chr&gt;       &lt;dttm&gt;              &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;
+ 1 0f84c8f2-2… 2024-03-23 10:35:10 Sat     Careum Bi… &lt;NA&gt;            8.55  47.4
+ 2 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 3 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 4 0f84c8f2-2… 2024-03-23 11:55:49 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 5 0f84c8f2-2… 2024-03-23 11:56:00 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 6 0f84c8f2-2… 2024-03-23 11:56:11 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 7 0f84c8f2-2… 2024-03-23 11:56:22 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 8 0f84c8f2-2… 2024-03-23 11:56:33 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 9 0f84c8f2-2… 2024-03-23 11:56:44 Sat     &lt;NA&gt;       Walk            8.55  47.4
+10 0f84c8f2-2… 2024-03-23 11:56:55 Sat     &lt;NA&gt;       Walk            8.55  47.4
+# ℹ 572 more rows
+# ℹ 6 more variables: geometry &lt;POINT [m]&gt;, nMinus2 &lt;dbl&gt;, nMinus1 &lt;dbl&gt;,
+#   nPlus1 &lt;dbl&gt;, nPlus2 &lt;dbl&gt;, stepMean &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># explore these values</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(posmo_2024_03_23<span class="sc">$</span>stepMean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+   0.00   14.62   18.07   29.43   31.93  159.78       4 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(posmo_2024_03_23<span class="sc">$</span>stepMean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="cma-week4-solution_files/figure-html/mean%20step%20for%20posmo%202303-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(posmo_2024_03_23<span class="sc">$</span>stepMean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="cma-week4-solution_files/figure-html/mean%20step%20for%20posmo%202303-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="task-3-visualize-segmented-trajectories" class="level3">
+<h3 class="anchored" data-anchor-id="task-3-visualize-segmented-trajectories">Task 3: Visualize Segmented Trajectories</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set mean as threshold as before</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23 <span class="ot">&lt;-</span> posmo_2024_03_23 <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">static =</span> stepMean <span class="sc">&lt;</span> <span class="fu">mean</span>(stepMean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>posmo_2303_filtered <span class="ot">&lt;-</span> posmo_2024_03_23 <span class="sc">|&gt;</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span>static)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>posmo_2303_filtered <span class="sc">|&gt;</span> </span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(lon_x, lat_y)) <span class="sc">+</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_path</span>() <span class="sc">+</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>() <span class="sc">+</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="cma-week4-solution_files/figure-html/visualize%20after%20filtering-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="task-4-segment-based-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="task-4-segment-based-analysis">Task 4: Segment-based analysis</h3>
+<p>(Copy from lab instruction) In applying Laube and Purves (2011), we’ve come as far as step b) in Figure 15.1. In order to complete the last steps (c and d), we need a unique ID for each segment that we can use as a grouping variable. The following function does just that (it assigns unique IDs based on the column static which you created in Task 2). You will learn about functions next week. For now, just copy the following code chunk into your script and run it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># unique ID for each segment based on the column static</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>rle_id <span class="ot">&lt;-</span> <span class="cf">function</span>(vec) {</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">rle</span>(vec)<span class="sc">$</span>lengths</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.factor</span>(<span class="fu">rep</span>(<span class="fu">seq_along</span>(x), <span class="at">times =</span> x))</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can run it for our dataframe.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23 <span class="ot">&lt;-</span> posmo_2024_03_23 <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">segment_id =</span> <span class="fu">rle_id</span>(static))</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>posmo_2024_03_23 <span class="sc">|&gt;</span> <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 582 × 15
+   user_id     datetime            weekday place_name transport_mode lon_x lat_y
+   &lt;chr&gt;       &lt;dttm&gt;              &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;
+ 1 0f84c8f2-2… 2024-03-23 10:35:10 Sat     Careum Bi… &lt;NA&gt;            8.55  47.4
+ 2 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 3 0f84c8f2-2… 2024-03-23 11:55:38 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 4 0f84c8f2-2… 2024-03-23 11:55:49 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 5 0f84c8f2-2… 2024-03-23 11:56:00 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 6 0f84c8f2-2… 2024-03-23 11:56:11 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 7 0f84c8f2-2… 2024-03-23 11:56:22 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 8 0f84c8f2-2… 2024-03-23 11:56:33 Sat     &lt;NA&gt;       Walk            8.55  47.4
+ 9 0f84c8f2-2… 2024-03-23 11:56:44 Sat     &lt;NA&gt;       Walk            8.55  47.4
+10 0f84c8f2-2… 2024-03-23 11:56:55 Sat     &lt;NA&gt;       Walk            8.55  47.4
+# ℹ 572 more rows
+# ℹ 8 more variables: geometry &lt;POINT [m]&gt;, nMinus2 &lt;dbl&gt;, nMinus1 &lt;dbl&gt;,
+#   nPlus1 &lt;dbl&gt;, nPlus2 &lt;dbl&gt;, stepMean &lt;dbl&gt;, static &lt;lgl&gt;, segment_id &lt;fct&gt;</code></pre>
+</div>
+</div>
+<p>Here we can see the steps are order by (1) time (2) static or not.</p>
+</section>
+<section id="task-5-6-similarity-measures-calculate-similarity" class="level3">
+<h3 class="anchored" data-anchor-id="task-5-6-similarity-measures-calculate-similarity">Task 5 &amp; 6: Similarity measures, Calculate similarity</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>pedestrian_df <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"pedestrian.csv"</span>, <span class="st">","</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 289 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl  (3): TrajID, E, N
+dttm (1): DatetimeUTC
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to sf object if necessary and plot trajectories</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>pedestrian_sf <span class="ot">&lt;-</span> pedestrian_df <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>), <span class="at">crs =</span> <span class="dv">2056</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pedestrian_sf, <span class="fu">aes</span>(<span class="at">x =</span> E, <span class="at">y =</span> N, <span class="at">color =</span> <span class="fu">factor</span>(TrajID))) <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_path</span>() <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="cma-week4-solution_files/figure-html/task%205-%20import%20pedestrain-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate trajectories by ID</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>trajectories <span class="ot">&lt;-</span> <span class="fu">split</span>(pedestrian_df, pedestrian_df<span class="sc">$</span>TrajID)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co"># create a trajectory matrix</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>traj_matrices <span class="ot">&lt;-</span> <span class="fu">lapply</span>(trajectories, <span class="cf">function</span>(df) {</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.matrix</span>(df[, <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>)])</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># choose trajectory 1 as basis</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>traj1 <span class="ot">&lt;-</span> traj_matrices[[<span class="dv">1</span>]]</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate similarity between 1 and 2-6</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co"># write a function to generate all comparison methods</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>similarities <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="cf">function</span>(i) {</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    traj_i <span class="ot">&lt;-</span> traj_matrices[[i]]</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">DTW =</span> <span class="fu">DTW</span>(traj1, traj_i),</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">EditDist =</span> <span class="fu">EditDist</span>(traj1, traj_i),</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">Frechet =</span> <span class="fu">Frechet</span>(traj1, traj_i),</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">LCSS =</span> <span class="fu">LCSS</span>(traj1, traj_i, <span class="at">pointSpacing =</span> <span class="dv">10</span>, <span class="at">pointDistance =</span> <span class="dv">10</span>, <span class="at">errorMarg =</span> <span class="dv">3</span>)</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract comparison result as a dataframe</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>results_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Trajectory =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>,</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">DTW =</span> <span class="fu">sapply</span>(similarities, <span class="cf">function</span>(x) x<span class="sc">$</span>DTW),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">EditDist =</span> <span class="fu">sapply</span>(similarities, <span class="cf">function</span>(x) x<span class="sc">$</span>EditDist),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Frechet =</span> <span class="fu">sapply</span>(similarities, <span class="cf">function</span>(x) x<span class="sc">$</span>Frechet),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">LCSS =</span> <span class="fu">sapply</span>(similarities, <span class="cf">function</span>(x) x<span class="sc">$</span>LCSS)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the results</span></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>results_melted <span class="ot">&lt;-</span> <span class="fu">melt</span>(results_df, <span class="at">id.vars =</span> <span class="st">"Trajectory"</span>)</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(results_melted, <span class="fu">aes</span>(<span class="at">x =</span> Trajectory, <span class="at">y =</span> value, <span class="at">fill =</span> variable)) <span class="sc">+</span></span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Computed similarities using different measures"</span>, </span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Comparison trajectory"</span>, </span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Value"</span>) <span class="sc">+</span></span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> variable, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="cma-week4-solution_files/figure-html/task%206-%20visualize%20comparison-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>
