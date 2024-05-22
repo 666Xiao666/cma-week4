@@ -1,0 +1,249 @@
+---
+title: "cma-week4-solution"
+author: Xiao Cui
+format: html
+---
+
+## Preparation
+Here is the code from preparation.
+```{r preparation data import}
+library("readr")
+library("dplyr")
+library("sf")
+library("ggplot2")
+library("lubridate")
+library("SimilarityMeasures")
+library("reshape2") # Plot the results
+wildschwein <- read_delim("wildschwein_BE_2056.csv", ",")
+
+# We will use E and N later, so set the remove as false.
+# if true, the original coordinate column will remove after generating geometry
+
+sabi <- wildschwein |>
+    st_as_sf(coords = c("E", "N"), crs = 2056, remove = FALSE) |>
+    filter(TierName == "Sabi", DatetimeUTC >= "2015-07-01", DatetimeUTC < "2015-07-03")
+
+# mark the static points by plotting
+# real good plot!
+# but just "mark" the static points (without calculation)
+ggplot(sabi, aes(E, N, color=DatetimeUTC)) + geom_point() + geom_path() + coord_fixed() + scale_color_datetime(low = "blue", high = "red") + guides(color = guide_colorbar(title.position = "top", title.hjust = .5, barwidth = unit(20, "lines"), barheight = unit(1, "lines"))) + theme(legend.position = "bottom") + geom_point(y=1205120, x=2570470, size = 20, pch =21, color ="black", stroke =4)
+```
+
+Step a): Specify a temporal window 
+In the above dataset, the sampling interval is 15 minutes. If we take a temporal window of 60 minutes, that would mean including 4 fixes. We need to calculate the following Euclidean distances (pos representing single location):
+
+pos[n-2] to pos[n]
+pos[n-1] to pos[n]
+pos[n] to pos[n+1]
+pos[n] to pos[n+2]
+
+Step b): Measure the distance from every point to every other point within this temporal window 
+We can use the function distance_by_element from week 2 in combination with lead() and lag() to calculate the Euclidean distance. For example, to create the necessary offset of n-2, we use lag(x, 2). For each offset, we create one individual column.
+
+```{r recap: set geometry as lag}
+# recap: set geometry as lag
+distance_by_element <- function(later, now) {
+  as.numeric(
+    st_distance(later, now, by_element = TRUE)
+  )
+}
+
+sabi <- sabi |>
+    mutate(
+        nMinus2 = distance_by_element(lag(geometry, 2), geometry),  # distance to pos -30 minutes
+        nMinus1 = distance_by_element(lag(geometry, 1), geometry),  # distance to pos -15 minutes
+        nPlus1  = distance_by_element(geometry, lead(geometry, 1)), # distance to pos +15 mintues
+        nPlus2  = distance_by_element(geometry, lead(geometry, 2))  # distance to pos +30 minutes
+    )
+```
+
+Now we want to calculate the mean distance of nMinus2, nMinus1, nPlus1, nPlus2 for each row. Since we want the mean value per Row, we have to explicitly specify this before mutate() with the function rowwise(). To remove this rowwise-grouping, we end the operation with ungroup().
+
+Note that for the first two positions, we cannot calculate a stepMean since there is no Position n-2 for these positions. This is also true for the last to positions (lacking a position n+2).
+```{r the mean distance}
+sabi <- sabi |>
+    rowwise() |>
+    mutate(
+        stepMean = mean(c(nMinus2, nMinus1, nPlus1, nPlus2))
+    ) |>
+    ungroup()
+
+sabi
+```
+Step c): Remove “static points”
+We can now determine if an animal is moving or not by specifying a threshold distance on stepMean. In our example, we use the mean value as a threshold: Positions with distances below this value are considered static.
+
+```{r basic visualization}
+sabi <- sabi |>
+    mutate(static = stepMean < mean(stepMean, na.rm = TRUE))
+
+sabi_filter <- sabi |>
+    filter(!static)
+
+sabi_filter |>
+    ggplot(aes(E, N)) +
+    geom_path() +
+    geom_point() +
+    coord_fixed() +
+    theme(legend.position = "bottom")
+```
+## Task
+We will use our posmo data in a certain day in task 1-4.
+### Task 1: Segmentation
+```{r posmo import}
+# import data
+posmo <- read_delim("posmo_03_23_05_03.csv", ",")
+# show as a tibble
+posmo |> as_tibble()
+```
+As you see, we have data from different dates, so we need to filter data by unique dates.
+```{r posmo sf}
+# Convert to sf
+posmo_sf <- st_as_sf(posmo, coords = c("lon_x", "lat_y"), crs = 4326, remove = FALSE)
+# Convert CRS to CH1903 / LV95 (EPSG:2056)
+posmo_sf <- st_transform(posmo_sf, crs = 2056)
+```
+
+```{r filter data by date}
+# Function to filter data for a given date
+filter_data_by_date <- function(data, date) {
+  date <- as.Date(date) # Convert the input date to Date format
+  filtered_data <- data %>%
+    filter(as.Date(datetime) == date)
+  return(filtered_data)
+}
+
+# Usage of the function, filter data in 2024-03-23
+posmo_2024_03_23 <- filter_data_by_date(posmo_sf, "2024-03-23")
+
+# Show the filtered data in 2024-03-23
+head(posmo_2024_03_23)
+```
+```{r distance calculation}
+# recap: set geometry as lag
+distance_by_element <- function(later, now) {
+  as.numeric(
+    st_distance(later, now, by_element = TRUE)
+  )
+}
+
+posmo_2024_03_23<- posmo_2024_03_23 |>
+    mutate(
+        nMinus2 = distance_by_element(lag(geometry, 2), geometry),  # distance to pos -30 minutes
+        nMinus1 = distance_by_element(lag(geometry, 1), geometry),  # distance to pos -15 minutes
+        nPlus1  = distance_by_element(geometry, lead(geometry, 1)), # distance to pos +15 mintues
+        nPlus2  = distance_by_element(geometry, lead(geometry, 2))  # distance to pos +30 minutes
+    )
+posmo_2024_03_23
+```
+### Task 2: Specify and apply threshold d
+```{r mean step for posmo 2303}
+posmo_2024_03_23 <- posmo_2024_03_23 |>
+    rowwise() |>
+    mutate(
+        stepMean = mean(c(nMinus2, nMinus1, nPlus1, nPlus2))
+    ) |>
+    ungroup()
+
+posmo_2024_03_23
+# explore these values
+summary(posmo_2024_03_23$stepMean)
+hist(posmo_2024_03_23$stepMean)
+boxplot(posmo_2024_03_23$stepMean)
+```
+### Task 3: Visualize Segmented Trajectories
+```{r visualize after filtering}
+# set mean as threshold as before
+posmo_2024_03_23 <- posmo_2024_03_23 |>
+    mutate(static = stepMean < mean(stepMean, na.rm = TRUE))
+
+posmo_2303_filtered <- posmo_2024_03_23 |>
+    filter(!static)
+
+posmo_2303_filtered |> 
+    ggplot(aes(lon_x, lat_y)) +
+    geom_path() +
+    geom_point() +
+    coord_fixed() +
+    theme(legend.position = "bottom")
+```
+### Task 4: Segment-based analysis
+(Copy from lab instruction)
+In applying Laube and Purves (2011), we’ve come as far as step b) in Figure 15.1. In order to complete the last steps (c and d), we need a unique ID for each segment that we can use as a grouping variable. The following function does just that (it assigns unique IDs based on the column static which you created in Task 2). You will learn about functions next week. For now, just copy the following code chunk into your script and run it.
+```{r unique id for column static}
+# unique ID for each segment based on the column static
+rle_id <- function(vec) {
+    x <- rle(vec)$lengths
+    as.factor(rep(seq_along(x), times = x))
+}
+```
+Now we can run it for our dataframe.
+```{r apply static id for our data}
+posmo_2024_03_23 <- posmo_2024_03_23 |>
+    mutate(segment_id = rle_id(static))
+posmo_2024_03_23 |> as_tibble()
+```
+Here we can see the steps are order by (1) time (2) static or not.
+
+### Task 5 & 6: Similarity measures, Calculate similarity
+```{r task 5: import pedestrain}
+pedestrian_df <- read_delim("pedestrian.csv", ",")
+
+# Convert to sf object if necessary and plot trajectories
+pedestrian_sf <- pedestrian_df %>%
+    st_as_sf(coords = c("E", "N"), crs = 2056, remove = FALSE)
+
+ggplot(pedestrian_sf, aes(x = E, y = N, color = factor(TrajID))) +
+    geom_path() +
+    coord_equal() +
+    theme(legend.position = "bottom")
+```
+```{r task 5: trajectory matrix}
+# generate trajectories by ID
+trajectories <- split(pedestrian_df, pedestrian_df$TrajID)
+
+# create a trajectory matrix
+traj_matrices <- lapply(trajectories, function(df) {
+    as.matrix(df[, c("E", "N")])
+})
+```
+
+```{r task 6: calculate similarity}
+# choose trajectory 1 as basis
+traj1 <- traj_matrices[[1]]
+
+# calculate similarity between 1 and 2-6
+# write a function to generate all comparison methods
+similarities <- lapply(2:6, function(i) {
+    traj_i <- traj_matrices[[i]]
+    list(
+        DTW = DTW(traj1, traj_i),
+        EditDist = EditDist(traj1, traj_i),
+        Frechet = Frechet(traj1, traj_i),
+        LCSS = LCSS(traj1, traj_i, pointSpacing = 10, pointDistance = 10, errorMarg = 3)
+    )
+})
+```
+
+```{r task 6: visualize comparison}
+# extract comparison result as a dataframe
+results_df <- data.frame(
+    Trajectory = 2:6,
+    DTW = sapply(similarities, function(x) x$DTW),
+    EditDist = sapply(similarities, function(x) x$EditDist),
+    Frechet = sapply(similarities, function(x) x$Frechet),
+    LCSS = sapply(similarities, function(x) x$LCSS)
+)
+
+# Plot the results
+results_melted <- melt(results_df, id.vars = "Trajectory")
+
+ggplot(results_melted, aes(x = Trajectory, y = value, fill = variable)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = "Computed similarities using different measures", 
+         x = "Comparison trajectory", 
+         y = "Value") +
+    facet_wrap(~ variable, scales = "free") +
+    theme_minimal()
+```
+
